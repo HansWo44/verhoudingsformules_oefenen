@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verhoudingsformules oefenen (4 mavo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+    }
+
+    .app {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    .salt-name-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+    }
+
+    .salt-name-label {
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    .salt-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    button {
+      font-size: 1rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #ffffff;
+      cursor: pointer;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    button:hover {
+      filter: brightness(0.97);
+    }
+
+    .board {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .column {
+      flex: 1 1 320px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-height: 200px;
+    }
+
+    .column h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+      text-align: center;
+    }
+
+    .ion-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ion-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+    }
+
+    .bubble {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      min-height: 40px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 2px solid #333;
+      background: #ffffff;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      text-align: center;
+      font-size: 1.0rem;
+    }
+
+    .bubble.selected {
+      background: #e8f0ff;
+      border-color: #1a73e8;
+    }
+
+    .count-label {
+      min-width: 44px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .charge-display {
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #f1f3f4;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .charge-ok {
+      background: #d1ffd1;
+      border: 1px solid #2e7d32;
+    }
+
+    .charge-not-ok {
+      background: #ffd1d1;
+      border: 1px solid #c62828;
+    }
+
+    .formula-box {
+      margin-top: 14px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .formula-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      flex: 1 1 160px;
+      font-size: 1rem;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .feedback strong {
+      font-weight: 600;
+    }
+
+    @media (max-width: 700px) {
+      .board {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>Verhoudingsformules oefenen (4 mavo)</h1>
+
+  <div class="salt-name-box">
+    <div class="salt-name-label">Naam van het zout:</div>
+    <div class="salt-name" id="saltName">–</div>
+  </div>
+
+  <div class="controls">
+    <button id="newSaltBtn">Nieuwe opgave</button>
+    <button id="resetChoiceBtn">Reset keuze ionen</button>
+    <button id="checkBtn">Controleer</button>
+  </div>
+
+  <div class="board">
+    <div class="column">
+      <h2>Positieve ionen (kationen)</h2>
+      <div class="ion-section" id="positiveIons"></div>
+    </div>
+    <div class="column">
+      <h2>Negatieve ionen (anionen)</h2>
+      <div class="ion-section" id="negativeIons"></div>
+    </div>
+  </div>
+
+  <div class="charge-display" id="chargeDisplay">
+    Totale lading: 0
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-row">
+      <label for="formulaInput">
+        Verhoudingsformule (bijv. Na2CO3, Ca(OH)2):
+      </label>
+      <input id="formulaInput" type="text" autocomplete="off" />
+    </div>
+
+    <!-- NIEUW: live preview van de ingevoerde formule met subscript -->
+    <div class="formula-row" style="font-size:0.95rem;">
+      <span>Jouw ingevoerde formule:</span>
+      <span id="userFormulaPreview" style="margin-left:4px;font-weight:500;">–</span>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <p style="margin-top:16px;font-size:0.9rem;color:#555;">
+    Tip voor leerlingen: zorg eerst dat de totale lading 0 is met zo min mogelijk ionen.
+    Schrijf daarna de verhoudingsformule zonder ladingen en met haakjes rond samengestelde ionen als er meer dan één van is.
+  </p>
+</div>
+
+<script>
+  // ---- DATA VOOR IONEN ----
+  const positiveIonsData = [
+    { id: "Ag",  charge: +1, display: "Ag⁺",   core: "Ag",  baseName: "zilver",    isPoly: false },
+    { id: "Al",  charge: +3, display: "Al³⁺",  core: "Al",  baseName: "aluminium", isPoly: false },
+    { id: "Ba",  charge: +2, display: "Ba²⁺",  core: "Ba",  baseName: "barium",    isPoly: false },
+    { id: "Ca",  charge: +2, display: "Ca²⁺",  core: "Ca",  baseName: "calcium",   isPoly: false },
+    { id: "Cu",  charge: +2, display: "Cu²⁺",  core: "Cu",  baseName: "koper",     isPoly: false },
+    { id: "Fe2", charge: +2, display: "Fe²⁺",  core: "Fe",  baseName: "ijzer(II)", isPoly: false },
+    { id: "Fe3", charge: +3, display: "Fe³⁺",  core: "Fe",  baseName: "ijzer(III)",isPoly: false },
+    { id: "H",   charge: +1, display: "H⁺",    core: "H",   baseName: "waterstof", isPoly: false },
+    { id: "K",   charge: +1, display: "K⁺",    core: "K",   baseName: "kalium",    isPoly: false },
+    { id: "Mg",  charge: +2, display: "Mg²⁺",  core: "Mg",  baseName: "magnesium", isPoly: false },
+    { id: "Na",  charge: +1, display: "Na⁺",   core: "Na",  baseName: "natrium",   isPoly: false },
+    { id: "Pb",  charge: +2, display: "Pb²⁺",  core: "Pb",  baseName: "lood",      isPoly: false },
+    { id: "Sn",  charge: +2, display: "Sn²⁺",  core: "Sn",  baseName: "tin",       isPoly: false },
+    { id: "Zn",  charge: +2, display: "Zn²⁺",  core: "Zn",  baseName: "zink",      isPoly: false },
+    { id: "NH4", charge: +1, display: "NH₄⁺",  core: "NH4", baseName: "ammonium",  isPoly: true  }
+  ];
+
+  const negativeIonsData = [
+    { id: "Br",   charge: -1, display: "Br⁻",    core: "Br",   baseName: "bromide",    isPoly: false },
+    { id: "Cl",   charge: -1, display: "Cl⁻",    core: "Cl",   baseName: "chloride",   isPoly: false },
+    { id: "F",    charge: -1, display: "F⁻",     core: "F",    baseName: "fluoride",   isPoly: false },
+    { id: "I",    charge: -1, display: "I⁻",     core: "I",    baseName: "jodide",     isPoly: false },
+    { id: "O",    charge: -2, display: "O²⁻",    core: "O",    baseName: "oxide",      isPoly: false },
+    { id: "S",    charge: -2, display: "S²⁻",    core: "S",    baseName: "sulfide",    isPoly: false },
+    { id: "CO3",  charge: -2, display: "CO₃²⁻",  core: "CO3",  baseName: "carbonaat",  isPoly: true  },
+    { id: "NO3",  charge: -1, display: "NO₃⁻",   core: "NO3",  baseName: "nitraat",    isPoly: true  },
+    { id: "OH",   charge: -1, display: "OH⁻",    core: "OH",   baseName: "hydroxide",  isPoly: true  },
+    { id: "PO4",  charge: -3, display: "PO₄³⁻",  core: "PO4",  baseName: "fosfaat",    isPoly: true  },
+    { id: "SO4",  charge: -2, display: "SO₄²⁻",  core: "SO4",  baseName: "sulfaat",    isPoly: true  }
+  ];
+
+  // ------ HELPERFUNCTIES ------
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function gcd(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) {
+      const t = b;
+      b = a % b;
+      a = t;
+    }
+    return a;
+  }
+
+  function makeSaltName(cation, anion) {
+    return cation.baseName + anion.baseName;
+  }
+
+  function buildFormula(cation, anion) {
+    const zPlus = cation.charge;
+    const zMinus = -anion.charge;
+    const g = gcd(zPlus, zMinus);
+    const nCation = zMinus / g;
+    const nAnion  = zPlus / g;
+
+    let formula = "";
+
+    formula += cation.core;
+    if (nCation > 1) {
+      formula += nCation.toString();
+    }
+
+    if (anion.isPoly && nAnion > 1) {
+      formula += "(" + anion.core + ")" + nAnion.toString();
+    } else {
+      formula += anion.core;
+      if (nAnion > 1) {
+        formula += nAnion.toString();
+      }
+    }
+
+    return formula;
+  }
+
+  function normalizeFormulaString(str) {
+    return str.replace(/\s+/g, "").toUpperCase();
+  }
+
+  // Cijfers in een formule als subscript weergeven
+  function formatFormulaHTML(formulaStr) {
+    return formulaStr.replace(/(\d+)/g, "<sub>$1</sub>");
+  }
+
+  // ------ DOM ELEMENTEN ------
+  const saltNameEl = document.getElementById("saltName");
+  const positiveContainer = document.getElementById("positiveIons");
+  const negativeContainer = document.getElementById("negativeIons");
+  const chargeDisplay = document.getElementById("chargeDisplay");
+  const formulaInput = document.getElementById("formulaInput");
+  const feedbackEl = document.getElementById("feedback");
+  const userFormulaPreview = document.getElementById("userFormulaPreview");
+
+  const newSaltBtn = document.getElementById("newSaltBtn");
+  const resetChoiceBtn = document.getElementById("resetChoiceBtn");
+  const checkBtn = document.getElementById("checkBtn");
+
+  // ------ STATE ------
+  let currentCation = null;
+  let currentAnion = null;
+  let currentCorrectFormula = null;
+
+  const selectedCounts = {};
+
+  // ------ IONEN TEKENEN ------
+  function renderIonLists() {
+    positiveContainer.innerHTML = "";
+    negativeContainer.innerHTML = "";
+    selectedCountsClear();
+
+    positiveIonsData.forEach(ion => {
+      const row = document.createElement("div");
+      row.className = "ion-row";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = ion.display;
+      bubble.dataset.ionId = ion.id;
+      bubble.dataset.charge = ion.charge.toString();
+
+      const countLabel = document.createElement("div");
+      countLabel.className = "count-label";
+      countLabel.textContent = "× 0";
+
+      row.appendChild(bubble);
+      row.appendChild(countLabel);
+      positiveContainer.appendChild(row);
+
+      selectedCounts[ion.id] = 0;
+
+      bubble.addEventListener("click", () => {
+        let c = selectedCounts[ion.id] || 0;
+        c = (c + 1) % 10;
+        selectedCounts[ion.id] = c;
+        updateIonVisual(ion.id);
+        updateTotalCharge();
+      });
+
+      bubble._countLabel = countLabel;
+    });
+
+    negativeIonsData.forEach(ion => {
+      const row = document.createElement("div");
+      row.className = "ion-row";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = ion.display;
+      bubble.dataset.ionId = ion.id;
+      bubble.dataset.charge = ion.charge.toString();
+
+      const countLabel = document.createElement("div");
+      countLabel.className = "count-label";
+      countLabel.textContent = "× 0";
+
+      row.appendChild(bubble);
+      row.appendChild(countLabel);
+      negativeContainer.appendChild(row);
+
+      selectedCounts[ion.id] = 0;
+
+      bubble.addEventListener("click", () => {
+        let c = selectedCounts[ion.id] || 0;
+        c = (c + 1) % 10;
+        selectedCounts[ion.id] = c;
+        updateIonVisual(ion.id);
+        updateTotalCharge();
+      });
+
+      bubble._countLabel = countLabel;
+    });
+  }
+
+  function updateIonVisual(ionId) {
+    const bubbles = document.querySelectorAll(`.bubble[data-ion-id="${ionId}"]`);
+    bubbles.forEach(bubble => {
+      const count = selectedCounts[ionId] || 0;
+      const label = bubble._countLabel;
+      if (label) {
+        label.textContent = "× " + count;
+      }
+      if (count > 0) {
+        bubble.classList.add("selected");
+      } else {
+        bubble.classList.remove("selected");
+      }
+    });
+  }
+
+  function selectedCountsClear() {
+    Object.keys(selectedCounts).forEach(k => selectedCounts[k] = 0);
+    document.querySelectorAll(".bubble").forEach(b => {
+      b.classList.remove("selected");
+      if (b._countLabel) {
+        b._countLabel.textContent = "× 0";
+      }
+    });
+    updateTotalCharge();
+  }
+
+  // ------ LADINGSBEREKENING ------
+  function updateTotalCharge() {
+    let total = 0;
+    positiveIonsData.forEach(ion => {
+      total += (selectedCounts[ion.id] || 0) * ion.charge;
+    });
+    negativeIonsData.forEach(ion => {
+      total += (selectedCounts[ion.id] || 0) * ion.charge;
+    });
+
+    let text = "Totale lading: ";
+    if (total > 0) text += "+" + total;
+    else text += total.toString();
+
+    chargeDisplay.textContent = text;
+
+    chargeDisplay.classList.remove("charge-ok", "charge-not-ok");
+    if (total === 0) {
+      chargeDisplay.classList.add("charge-ok");
+    } else {
+      chargeDisplay.classList.add("charge-not-ok");
+    }
+  }
+
+  // ------ NIEUWE OPGAVE ------
+  function newSalt() {
+    const catIndex = Math.floor(Math.random() * positiveIonsData.length);
+    const anIndex = Math.floor(Math.random() * negativeIonsData.length);
+    currentCation = positiveIonsData[catIndex];
+    currentAnion  = negativeIonsData[anIndex];
+
+    const name = makeSaltName(currentCation, currentAnion);
+    saltNameEl.textContent = name;
+
+    currentCorrectFormula = buildFormula(currentCation, currentAnion);
+
+    formulaInput.value = "";
+    feedbackEl.textContent = "";
+    userFormulaPreview.innerHTML = "–";
+    selectedCountsClear();
+    updateTotalCharge();
+  }
+
+  // ------ USER FORMULE PREVIEW ------
+  function updateUserFormulaPreview() {
+    const raw = formulaInput.value.trim();
+    if (!raw) {
+      userFormulaPreview.innerHTML = "–";
+      return;
+    }
+    userFormulaPreview.innerHTML = formatFormulaHTML(raw);
+  }
+
+  // ------ CONTROLEREN ------
+  function checkAnswer() {
+    if (!currentCation || !currentAnion) return;
+
+    feedbackEl.innerHTML = "";
+
+    const requiredPosId = currentCation.id;
+    const requiredNegId = currentAnion.id;
+
+    const totalChargeZero = (() => {
+      let total = 0;
+      positiveIonsData.forEach(ion => {
+        total += (selectedCounts[ion.id] || 0) * ion.charge;
+      });
+      negativeIonsData.forEach(ion => {
+        total += (selectedCounts[ion.id] || 0) * ion.charge;
+      });
+      return total === 0;
+    })();
+
+    let wrongIonUsed = false;
+    let usedRequiredPos = false;
+    let usedRequiredNeg = false;
+
+    Object.keys(selectedCounts).forEach(id => {
+      const count = selectedCounts[id] || 0;
+      if (count > 0) {
+        if (id === requiredPosId) usedRequiredPos = true;
+        else if (id === requiredNegId) usedRequiredNeg = true;
+        else wrongIonUsed = true;
+      }
+    });
+
+    let messages = [];
+
+    if (!usedRequiredPos || !usedRequiredNeg) {
+      messages.push("Je hebt niet de juiste combinatie van kation en anion gekozen.");
+    }
+    if (wrongIonUsed) {
+      messages.push("Je hebt ook ionen gekozen die niet in dit zout voorkomen.");
+    }
+    if (!totalChargeZero) {
+      messages.push("De totale lading is nog niet 0. Pas de aantallen ionen aan.");
+    }
+
+    const userFormula = formulaInput.value.trim();
+    const normalizedUser = normalizeFormulaString(userFormula);
+    const normalizedCorrect = normalizeFormulaString(currentCorrectFormula);
+
+    // preview bijwerken (voor het geval er nog niet getypt werd sinds laatste toets)
+    updateUserFormulaPreview();
+
+    if (userFormula.length === 0) {
+      messages.push("Typ ook de verhoudingsformule in (bijvoorbeeld Na2CO3 of Ca(OH)2).");
+    } else if (normalizedUser === normalizedCorrect) {
+      messages.push(
+        "<strong>Formule klopt!</strong> De verhoudingsformule is " +
+        formatFormulaHTML(currentCorrectFormula) +
+        "."
+      );
+    } else {
+      messages.push(
+        "<strong>Formule is niet helemaal goed.</strong> De juiste verhoudingsformule is: <strong>" +
+        formatFormulaHTML(currentCorrectFormula) +
+        "</strong>."
+      );
+    }
+
+    feedbackEl.innerHTML = messages.join("<br>");
+  }
+
+  // ------ EVENT LISTENERS ------
+  newSaltBtn.addEventListener("click", () => {
+    newSalt();
+  });
+
+  resetChoiceBtn.addEventListener("click", () => {
+    selectedCountsClear();
+    feedbackEl.textContent = "";
+    userFormulaPreview.innerHTML = "–";
+    formulaInput.value = "";
+  });
+
+  checkBtn.addEventListener("click", () => {
+    checkAnswer();
+  });
+
+  formulaInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      checkAnswer();
+    }
+  });
+
+  formulaInput.addEventListener("input", () => {
+    updateUserFormulaPreview();
+  });
+
+  // ------ INIT ------
+  renderIonLists();
+  newSalt();
+</script>
+</body>
+</html>
